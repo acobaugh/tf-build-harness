@@ -5,7 +5,8 @@ ENV GOLANG_VERSION=1.11.2
 ENV RUBY_VERSION=2.4.2
 
 # packages
-RUN apk add curl unzip gnupg git bash
+# -dev, lib*, build-base, bash, and linux-headers are needed for rbenv install
+RUN apk add curl unzip gnupg git bash libssl1.0 libcrypto1.0 libffi-dev build-base linux-headers zlib-dev openssl-dev readline-dev
 
 # terraform
 ADD pgp_keys.asc .
@@ -35,13 +36,12 @@ RUN git clone https://github.com/rbenv/rbenv.git /usr/local/rbenv \
     && mkdir -p "$(rbenv root)"/plugins \
     && git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
 
-RUN apk add libssl1.0 libcrypto1.0 \
-    && apk add --virtual build-deps build-base linux-headers zlib-dev openssl-dev readline-dev \
-    && rbenv install ${RUBY_VERSION} \
+# ruby
+RUN rbenv install ${RUBY_VERSION} \
     && rbenv rehash \
-    && rbenv global ${RUBY_VERSION} \
-    && apk del build-deps
+    && rbenv global ${RUBY_VERSION}
 
+# bundler
 RUN gem update --system && gem install --force bundler
 
 WORKDIR /work
