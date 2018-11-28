@@ -43,3 +43,5 @@ RUN apk add libssl1.0 libcrypto1.0 \
     && apk del build-deps
 
 RUN gem update --system && gem install --force bundler
+
+WORKDIR /work
