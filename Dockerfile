@@ -2,7 +2,7 @@ FROM alpine:3.8
 
 ENV TERRAFORM_VERSION=0.11.10
 ENV GOLANG_VERSION=1.11.2
-ENV RUBY_VERSION=2.4.2
+ENV RUBY_VERSION=2.4.5
 
 # packages
 # -dev, lib*, build-base, bash, and linux-headers are needed for rbenv install
