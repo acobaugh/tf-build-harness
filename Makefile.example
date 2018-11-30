@@ -1,0 +1,2 @@
+URL = https://raw.githubusercontent.com/acobaugh/terraform-test/master/terraform-test.mk
+-include $(shell test -f .terraform-test.mk || curl -sSL -o .terraform-test.mk "$(URL)"; echo .terraform-test.mk)

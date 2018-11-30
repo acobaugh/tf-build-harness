@@ -1,5 +1,15 @@
 FROM alpine:3.8
 
+ARG BUILD_DATE
+ARG VCS_REF
+
+LABEL \
+	org.label-schema.build-date="$BUILD_DATE" \
+	org.label-schema.name = "terraform-test" \
+	org.label-schema.description = "Terraform test image with Go, Ruby, Terraform" \
+	org.label-schema.vcs-url = "https://github.com/acobaugh/terraform-test" \
+	org.label-schema.vcs-ref = "$VCS_REF"
+
 ENV TERRAFORM_VERSION=0.11.10
 ENV GOLANG_VERSION=1.11.2
 ENV RUBY_VERSION=2.4.5
