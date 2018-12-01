@@ -3,16 +3,16 @@ TERRAFORM_TEST ?= acobaugh/terraform-test:latest
 AWS_DEFAULT_REGION ?= us-east-1
 
 # Do not edit below this line
-.PHONY: help .lint .validate .get .kitchen-verify .kitchen-destroy shell clean
 
 TERRAFORM := /usr/local/bin/terraform
-CACHE_VOLUME := terraform-test-cache
+BUILD_CACHE ?= $(shell pwd)/.build-cache
+DOCKER_USER ?= $(shell id -u)
 
-RUN = echo "=== Running in docker container $(TERRAFORM_TEST)"; \
-	docker run --rm -it \
+DOCKER = echo "=== Running in docker container $(TERRAFORM_TEST)"; \
+	docker run --rm -it -u $(DOCKER_USER)\
 	-w /workdir \
 	-v $(shell pwd):/workdir \
-	-v $(CACHE_VOLUME):/cache \
+	-v $(BUILD_CACHE):/cache \
 	-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	-e AWS_REGION=$(AWS_DEFAULT_REGION) \
@@ -23,43 +23,55 @@ RUN = echo "=== Running in docker container $(TERRAFORM_TEST)"; \
 	-e BUNDLE_SILENCE_ROOT_WARNING=1 \
 	$(TERRAFORM_TEST) 
 
-INIT_CACHE = \
-	docker volume ls | grep $(CACHE_VOLUME) >/dev/null || \
-	docker volume create $(CACHE_VOLUME)
+DOCKER_TARGETS := test test-all lint get validate kitchen-test kitchen-destroy bundle-install
+.PHONY: $(DOCKER_TARGETS)
 
+.PHONY: help
 help:
 	@echo Available targets:
-	@for t in lint validate get kitchen-test kitchen-destroy clean shell; do echo -e \\t$$t ; done ;
+	@for t in $(DOCKER_TARGETS) clean; do echo -e \\t$$t ; done ;
 
+.PHONY: .lint 
 .lint:
 	$(TERRAFORM) fmt -write=false -check=true
 
+.PHONY: .validate
 .validate:
 	$(TERRAFORM) validate -check-variables=false
 
+.PHONY: .get
 .get:
 	$(TERRAFORM) init -get-plugins -backend=false -input=false >/dev/null
 	$(TERRAFORM) init -get -backend=false -input=false >/dev/null
 
+.PHONY: .bundle-install bundle-install
 .bundle-install:
 	bundle install
 
+.PHONY: .kitchen-test kitchen-test
 .kitchen-test: .lint .validate .bundle-install
-	env
+	test -f .kitchen.yml || (echo "No .kitchen.yml, skipping kitchen-terraform tests" ; exit 0)
 	bundle exec kitchen test || (ret=$$?; $(MAKE) .kitchen-destroy; exit $$ret)
 
+.PHONY: .kitchen-destroy kitchen-destroy
 .kitchen-destroy: .bundle-install
 	bundle exec kitchen destroy
 
-shell:
-	@$(INIT_CACHE)
-	@$(RUN) bash
-
+.PHONY: clean
 clean:
-	rm -rf .terraform .kitchen terraform.tfstate.d .terraform-test.mk
+	rm -rf .build-cache .terraform .kitchen terraform.tfstate.d .terraform-test.mk
 
-%:
-	@$(INIT_CACHE)
-	@$(RUN) make .$@
+.PHONY: _test test
+.test: .lint .validate .get
+
+.PHONY: .test-all test-all
+.test-all: .test .kitchen-test
+
+initcache:
+	@echo === Ensuring build cache exists
+	mkdir -p $(BUILD_CACHE)
+
+$(DOCKER_TARGETS): initcache
+	@$(DOCKER) make .$@
 
 # vim: syntax=make
