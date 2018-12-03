@@ -60,6 +60,7 @@ help:
 .PHONY: clean
 clean:
 	rm -rf .build-cache .terraform .kitchen terraform.tfstate.d .terraform-test.mk
+	docker volume rm $(CACHE_VOLUME)
 
 .PHONY: _test test
 .test: .lint .validate .get
@@ -68,10 +69,10 @@ clean:
 .test-all: .test .kitchen-test
 
 initcache:
-	@echo === Ensuring build cache exists
+	@echo === Ensuring build cache directory exists
 	mkdir -p $(BUILD_CACHE)
 
 $(DOCKER_TARGETS): initcache
-	@$(DOCKER) make .$@
+	@test -n "$$CI" && make .$@ || $(DOCKER) make .$@
 
 # vim: syntax=make
