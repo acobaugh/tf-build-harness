@@ -15,7 +15,7 @@ See the output of `make help`
 
 # Usage
 
-At a minimum, copy the [Makefile.sample](/Makefile.sample) file to the root of
+At a minimum, copy the [Makefile.example](/Makefile.example) file to the root of
 your project. This file retrieves and includes the upstream
 [terraform-test.mk](/terraform-test.mk) file automatically via curl. You can
 alter the values of `AWS_DEFAULT_REGION` and the docker image to run via
@@ -23,7 +23,7 @@ alter the values of `AWS_DEFAULT_REGION` and the docker image to run via
 
 ## test
 
-`make test` requires no further setup, just the sample `Makefile`.
+`make test` requires no further setup, just the example `Makefile`.
 
 ## test-all
 
