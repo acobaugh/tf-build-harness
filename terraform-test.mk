@@ -68,11 +68,13 @@ clean:
 .PHONY: .test-all test-all
 .test-all: .test .kitchen-test
 
-initcache:
-	@echo === Ensuring build cache directory exists
+$(DOCKER_TARGETS):
+ifdef CI
+	@echo "=== Running in CI environment, running targets without docker"
+	$(MAKE) .$@
+else
 	mkdir -p $(BUILD_CACHE)
-
-$(DOCKER_TARGETS): initcache
-	@test -n "$$CI" && make .$@ || $(DOCKER) make .$@
+	$(DOCKER) make .$@
+endif
 
 # vim: syntax=make
