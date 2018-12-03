@@ -1,3 +1,5 @@
+![](https://img.shields.io/docker/build/acobaugh/terraform-test.svg)
+
 # terraform-test
 
 This repo contains a GNU Makefile and Dockerfile. It is intended to enable
@@ -34,7 +36,7 @@ Today, `test-all` only runs kitchen-test.
 `make kitchen-terraform` requires, at a minimum, a Gemfile (and Gemfile.lock
 for consistent Gem versioning, this is usually built automatically by bundler),
 `.kitchen.yml`, and a kitchen profile with controls. Examples of the
-first two are below. The latter is described in more detail on the
+first two are below. The latter is described in more detail on
 [kitchen-terraform's website](https://github.com/newcontext-oss/kitchen-terraform).
 
 ### .kitchen.yml
