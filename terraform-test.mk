@@ -74,7 +74,7 @@ ifdef CI
 	$(MAKE) .$@
 else
 	mkdir -p $(BUILD_CACHE)
-	$(DOCKER) make .$@
+	@$(DOCKER) make .$@
 endif
 
 # vim: syntax=make
