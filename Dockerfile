@@ -4,6 +4,13 @@ ENV TERRAFORM_VERSION=0.12.4
 ENV RUBY_VERSION=2.4.6
 ENV TERRATEST_LOG_PARSER_VERSION=0.17.5
 
+ENV TF_TEST_PATH=/terraform-test
+
+RUN mkdir -p ${TF_TEST_PATH}
+ADD bin ${TF_TEST_PATH}
+RUN chmod +x ${TF_TEST_PATH}/bin/*
+ENV PATH=${TF_TEST_PATH}/bin:$PATH
+
 # update/upgrade and all other packages
 RUN apk update \
  && apk upgrade \

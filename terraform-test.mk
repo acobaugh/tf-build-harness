@@ -7,6 +7,7 @@ AWS_DEFAULT_REGION ?= us-east-1
 TERRAFORM := /usr/local/bin/terraform
 BUILD_CACHE ?= $(shell pwd)/.build-cache
 DOCKER_USER ?= $(shell id -u)
+TERRAFORM_TEST_PATH=/terraform-test
 
 DOCKER = echo "=== Running in docker container $(TERRAFORM_TEST)"; \
 	docker run --rm -it -u $(DOCKER_USER)\
@@ -67,6 +68,10 @@ clean:
 
 .PHONY: .test-all test-all
 .test-all: .test .kitchen-test
+
+.PHONY: .docs docs
+.docs:
+	BUILD_HARNESS_PATH=$(TERRAFORM_TEST_PATH) $(TERRAFORM_TEST_PATH)/bin/terraform-docs.sh md . > README.md
 
 $(DOCKER_TARGETS):
 ifdef CI
