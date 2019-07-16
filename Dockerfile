@@ -14,6 +14,13 @@ ENV TERRAFORM_VERSION=0.11.10
 ENV GOLANG_VERSION=1.11.2
 ENV RUBY_VERSION=2.4.5
 
+ENV TF_TEST_PATH=/terraform-test
+
+RUN mkdir -p ${TF_TEST_PATH}
+ADD bin ${TF_TEST_PATH}
+RUN chmod +x ${TF_TEST_PATH}/bin/*
+ENV PATH=${TF_TEST_PATH}/bin:$PATH
+
 # packages
 # -dev, lib*, build-base, bash, and linux-headers are needed for rbenv install
 RUN apk add curl unzip gnupg git bash libssl1.0 libcrypto1.0 libffi-dev build-base linux-headers zlib-dev openssl-dev readline-dev
