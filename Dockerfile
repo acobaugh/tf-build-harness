@@ -5,13 +5,13 @@ ENV RUBY_VERSION=2.4.6
 ENV TERRATEST_LOG_PARSER_VERSION=0.17.5
 ENV TERRAFORM_DOCS_VERSION=v0.6.0
 
-ENV TF_TEST_PATH=/terraform-test
+ENV TF_BUILD_HARNESS_PATH=/tf-build-harness
 
 # custom bin directory
-RUN mkdir -p ${TF_TEST_PATH}
-ADD bin ${TF_TEST_PATH}/bin
-RUN chmod +x ${TF_TEST_PATH}/bin/*
-ENV PATH=${TF_TEST_PATH}/bin:$PATH
+RUN mkdir -p ${TF_BUILD_HARNESS_PATH}
+ADD bin ${TF_BUILD_HARNESS_PATH}/bin
+RUN chmod +x ${TF_BUILD_HARNESS_PATH}/bin/*
+ENV PATH=${TF_BUILD_HARNESS_PATH}/bin:$PATH
 
 # update/upgrade and all other packages
 RUN apk update \
