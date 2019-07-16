@@ -3,11 +3,13 @@ FROM alpine:3.10
 ENV TERRAFORM_VERSION=0.12.4
 ENV RUBY_VERSION=2.4.6
 ENV TERRATEST_LOG_PARSER_VERSION=0.17.5
+ENV TERRAFORM_DOCS_VERSION=v0.6.0
 
 ENV TF_TEST_PATH=/terraform-test
 
+# custom bin directory
 RUN mkdir -p ${TF_TEST_PATH}
-ADD bin ${TF_TEST_PATH}
+ADD bin ${TF_TEST_PATH}/bin
 RUN chmod +x ${TF_TEST_PATH}/bin/*
 ENV PATH=${TF_TEST_PATH}/bin:$PATH
 
@@ -26,6 +28,10 @@ RUN curl -Os https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terra
  && sha256sum -c terraform_${TERRAFORM_VERSION}_SHA256SUMS 2>&1 | grep "${TERRAFORM_VERSION}_linux_amd64.zip:\sOK" \
  && unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin \
  && rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
+# terraform-docs
+RUN curl -Os https://github.com/segmentio/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64 \
+ && mv terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64 /usr/local/bin/terraform-docs
 
 # gopath
 ENV GOPATH $HOME/go
