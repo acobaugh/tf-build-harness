@@ -1,10 +1,10 @@
 ![](https://img.shields.io/docker/build/acobaugh/terraform-test.svg)
 
-# terraform-test
+# tf-build-harness
 
 This repo contains a GNU Makefile and Dockerfile. It is intended to enable
 local development and CI tests of terraform modules using terraform,
-kitchen-terraform, and terratest (comming soon!).
+kitchen-terraform, terratest, terraform-docs, etc.
 
 The Dockerfile builds an
 [image](https://hub.docker.com/u/acobaugh/terraform-test) based on Alpine with
@@ -81,10 +81,13 @@ variables. Tests will be run in `us-east-1`, so your fixtures should specify
 
 * test: lint (fmt), validate, get
 * test-all: all targets from test, plus kitchen-terraform (and soon, [terratest](https://github.com/gruntwork-io/terratest)) 
+* docs: generate README.md using terraform-docs (with wrapper to support terraform 0.12)
 * Other targets are listed via `make help`
 
 # Versions
 
-* Terraform: 0.11.10
-* Go: 1.11.2
-* Ruby: 2.4.5
+* Terraform: 0.12.4
+* Go: 1.12.x
+* Ruby: 2.4.6
+* terraform-docs: 0.6.0
+* terratest_log_parser: 0.17.5

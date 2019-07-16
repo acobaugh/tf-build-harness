@@ -55,7 +55,7 @@ RUN rbenv install ${RUBY_VERSION} \
 RUN gem update --system && gem install --force bundler
 
 # terratest_log_parser
-RUN curl --location --silent --fail --show-error -o terratest_log_parser https://github.com/gruntwork-io/terratest/releases \
+RUN curl --location --silent --fail --show-error -o terratest_log_parser https://github.com/gruntwork-io/terratest/releases/download/${TERRATEST_LOG_PARSER_VERSION/terratest_log_parser_linux_amd64 \
  && chmod +x terratest_log_parser \
  && mv terratest_log_parser /usr/local/bin
 
