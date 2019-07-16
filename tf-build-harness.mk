@@ -24,7 +24,7 @@ DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS)"; \
 	-e BUNDLE_SILENCE_ROOT_WARNING=1 \
 	$(TF_BUILD_HARNESS) 
 
-DOCKER_TARGETS := test test-all lint get validate kitchen-test kitchen-destroy bundle-install
+DOCKER_TARGETS := docs test test-all lint get validate kitchen-test kitchen-destroy bundle-install
 .PHONY: $(DOCKER_TARGETS)
 
 .PHONY: help
