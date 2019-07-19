@@ -31,7 +31,8 @@ RUN curl -Os https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terra
 
 # terraform-docs
 RUN curl -OsL https://github.com/segmentio/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64 \
- && mv terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64 /usr/local/bin/terraform-docs
+ && mv terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64 /usr/local/bin/terraform-docs \
+ && chmod +x /usr/local/bin/terraform-docs
 
 # gopath
 ENV GOPATH $HOME/go
