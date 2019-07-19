@@ -1,5 +1,5 @@
 # Change these in your parent Makefile if desired
-TF_BUILD_HARNESS ?= quay.io/pennstate/tf-build-harness:latest
+TF_BUILD_HARNESS_IMAGE ?= quay.io/pennstate/tf-build-harness:latest
 AWS_DEFAULT_REGION ?= us-east-1
 
 # Do not edit below this line
@@ -9,7 +9,7 @@ BUILD_CACHE ?= $(shell pwd)/.build-cache
 DOCKER_USER ?= $(shell id -u)
 TF_BUILD_HARNESS_PATH ?= /tf-build-harness
 
-DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS)"; \
+DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	docker run --rm -it -u $(DOCKER_USER)\
 	-w /workdir \
 	-v $(shell pwd):/workdir \
@@ -22,9 +22,9 @@ DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS)"; \
 	-e BUNDLE_USER_CACHE=/cache/bundle-cache \
 	-e TF_PLUGIN_CACHE_DIR=/cache/terraform/plugin-cache \
 	-e BUNDLE_SILENCE_ROOT_WARNING=1 \
-	$(TF_BUILD_HARNESS) 
+	$(TF_BUILD_HARNESS_IMAGE) 
 
-DOCKER_TARGETS := docs test test-all lint get validate kitchen-test kitchen-destroy bundle-install
+DOCKER_TARGETS := docs test lint get validate kitchen-test kitchen-destroy bundle-install
 .PHONY: $(DOCKER_TARGETS)
 
 .PHONY: help
@@ -37,7 +37,7 @@ help:
 	$(TERRAFORM) fmt -write=false -check=true
 
 .PHONY: .validate
-.validate:
+.validate: .get
 	$(TERRAFORM) validate -check-variables=false
 
 .PHONY: .get
@@ -45,33 +45,31 @@ help:
 	$(TERRAFORM) init -get-plugins -backend=false -input=false >/dev/null
 	$(TERRAFORM) init -get -backend=false -input=false >/dev/null
 
-.PHONY: .bundle-install bundle-install
+.PHONY: .bundle-install
 .bundle-install:
 	bundle install
 
-.PHONY: .kitchen-test kitchen-test
-.kitchen-test: .lint .validate .bundle-install
+.PHONY: .kitchen-test
+.kitchen-test: .bundle-install
 	test -f .kitchen.yml || (echo "No .kitchen.yml, skipping kitchen-terraform tests" ; exit 0)
 	bundle exec kitchen test || (ret=$$?; $(MAKE) .kitchen-destroy; exit $$ret)
 
-.PHONY: .kitchen-destroy kitchen-destroy
+.PHONY: .kitchen-destroy
 .kitchen-destroy: .bundle-install
 	bundle exec kitchen destroy
 
 .PHONY: clean
 clean:
-	rm -rf .build-cache .terraform .kitchen terraform.tfstate.d .terraform-test.mk
+	rm -rf .build-cache .terraform .kitchen terraform.tfstate.d .tf-build-harness.mk
 	docker volume rm $(CACHE_VOLUME)
 
-.PHONY: _test test
-.test: .lint .validate .get
+.PHONY: .test
+.test: .kitchen-test 
 
-.PHONY: .test-all test-all
-.test-all: .test .kitchen-test
-
-.PHONY: .docs docs
+.PHONY: .docs
 .docs:
 	BUILD_HARNESS_PATH=$(TF_BUILD_HARNESS_PATH) $(TF_BUILD_HARNESS_PATH)/bin/terraform-docs.sh md . > README.md
+
 
 $(DOCKER_TARGETS):
 ifdef CI
