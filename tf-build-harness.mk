@@ -18,6 +18,8 @@ DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	-e AWS_REGION=$(AWS_DEFAULT_REGION) \
 	-e AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) \
+	-e AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
+	-e AWS_SECURITY_TOKEN=$(AWS_SECURITY_TOKEN) \
 	-e BUNDLE_PATH=/cache/bundle \
 	-e BUNDLE_USER_CACHE=/cache/bundle-cache \
 	-e TF_PLUGIN_CACHE_DIR=/cache/terraform/plugin-cache \
