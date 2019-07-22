@@ -16,7 +16,7 @@ ENV PATH=${TF_BUILD_HARNESS_PATH}/bin:$PATH
 # update/upgrade and all other packages
 RUN apk update \
  && apk upgrade \
- && apk add curl gnupg go git unzip bash libssl1.1 libcrypto1.1 libffi-dev build-base linux-headers zlib-dev openssl-dev readline-dev
+ && apk add curl gnupg go git unzip bash libssl1.1 libcrypto1.1 libffi-dev build-base linux-headers zlib-dev openssl-dev readline-dev openssh-client
 
 # terraform
 ADD pgp_keys.asc .
