@@ -14,6 +14,7 @@ DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	-w /workdir \
 	-v $(shell pwd):/workdir \
 	-v $(BUILD_CACHE):/cache \
+	-e HOME=/tmp/$(DOCKER_USER) \
 	-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	-e AWS_REGION=$(AWS_DEFAULT_REGION) \
@@ -54,10 +55,10 @@ help:
 .PHONY: .kitchen-test
 .kitchen-test: .bundle-install
 	test -f .kitchen.yml || (echo "No .kitchen.yml, skipping kitchen-terraform tests" ; exit 0)
-	bundle exec kitchen test || (ret=$$?; $(MAKE) .kitchen-destroy; exit $$ret)
+	bundle exec kitchen test || ( cat .kitchen/logs/*.log ; ret=$$? ; $(MAKE) .kitchen-destroy ; exit $$ret)
 
 .PHONY: .kitchen-destroy
-.kitchen-destroy: .bundle-install
+.kitchen-destroy:
 	bundle exec kitchen destroy
 
 .PHONY: clean
