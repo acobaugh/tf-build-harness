@@ -50,7 +50,8 @@ help:
 
 .PHONY: .bundle-install
 .bundle-install:
-	bundle install
+	@echo Installing kitchen-terraform Gem dependencies...
+	bundle install >/dev/null
 
 .PHONY: .kitchen-test
 .kitchen-test: .bundle-install
