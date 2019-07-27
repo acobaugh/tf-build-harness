@@ -86,7 +86,7 @@ variables. Tests will be run in `us-east-1`, so your fixtures should specify
 
 # Versions
 
-* Terraform: 0.12.4
+* Terraform: 0.12.5
 * Go: 1.12.x
 * Ruby: 2.4.6
 * terraform-docs: 0.6.0
