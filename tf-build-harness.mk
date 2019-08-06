@@ -27,7 +27,7 @@ DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	-e BUNDLE_SILENCE_ROOT_WARNING=1 \
 	$(TF_BUILD_HARNESS_IMAGE) 
 
-DOCKER_TARGETS := docs test lint get validate kitchen-test kitchen-destroy bundle-install
+DOCKER_TARGETS := docs test lint get validate kitchen-test kitchen-destroy
 .PHONY: $(DOCKER_TARGETS)
 
 .PHONY: help
@@ -48,18 +48,16 @@ help:
 	$(TERRAFORM) init -get-plugins -backend=false -input=false >/dev/null
 	$(TERRAFORM) init -get -backend=false -input=false >/dev/null
 
-.PHONY: .bundle-install
-.bundle-install:
-	@echo Installing kitchen-terraform Gem dependencies...
-	bundle install >/dev/null
-
 .PHONY: .kitchen-test
-.kitchen-test: .bundle-install
+.kitchen-test:
 	test -f .kitchen.yml || (echo "No .kitchen.yml, skipping kitchen-terraform tests" ; exit 0)
+	bundle install >/dev/null
 	bundle exec kitchen test || ( cat .kitchen/logs/*.log ; ret=$$? ; $(MAKE) .kitchen-destroy ; exit $$ret)
 
 .PHONY: .kitchen-destroy
 .kitchen-destroy:
+	test -f .kitchen.yml || (echo "No .kitchen.yml, skipping kitchen-terraform tests" ; exit 0)
+	bundle install >/dev/null
 	bundle exec kitchen destroy
 
 .PHONY: clean
