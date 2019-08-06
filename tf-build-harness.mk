@@ -50,15 +50,21 @@ help:
 
 .PHONY: .kitchen-test
 .kitchen-test:
-	test -f .kitchen.yml || (echo "No .kitchen.yml, skipping kitchen-terraform tests" ; exit 0)
+ifeq (,$(wildcard .kitchen.yml))
+	@echo "No .kitchen.yml, skipping kitchen-terraform tests";
+else
 	bundle install >/dev/null
 	bundle exec kitchen test || ( cat .kitchen/logs/*.log ; ret=$$? ; $(MAKE) .kitchen-destroy ; exit $$ret)
+endif
 
 .PHONY: .kitchen-destroy
 .kitchen-destroy:
-	test -f .kitchen.yml || (echo "No .kitchen.yml, skipping kitchen-terraform tests" ; exit 0)
+ifeq (,$(wildcard .kitchen.yml))
+	@echo "No .kitchen.yml, skipping kitchen-terraform tests"
+else
 	bundle install >/dev/null
 	bundle exec kitchen destroy
+endif
 
 .PHONY: clean
 clean:
