@@ -76,7 +76,13 @@ clean:
 
 .PHONY: .docs
 .docs:
-	BUILD_HARNESS_PATH=$(TF_BUILD_HARNESS_PATH) $(TF_BUILD_HARNESS_PATH)/bin/terraform-docs.sh md . > README.md
+ifeq (,$(wildcard README.header.md))
+	rm -f README.md
+else
+	cat README.header.md > README.md
+endif
+	BUILD_HARNESS_PATH=$(TF_BUILD_HARNESS_PATH) $(TF_BUILD_HARNESS_PATH)/bin/terraform-docs.sh md . >> README.md
+	cat README.md
 
 
 $(DOCKER_TARGETS):
