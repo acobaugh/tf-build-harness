@@ -37,7 +37,7 @@ help:
 
 .PHONY: .lint 
 .lint:
-	$(TERRAFORM) fmt -write=false -check=true
+	$(TERRAFORM) fmt -write=false -check=true -recursive
 
 .PHONY: .validate
 .validate: .get
