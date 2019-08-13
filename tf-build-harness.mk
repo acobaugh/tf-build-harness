@@ -41,7 +41,7 @@ help:
 
 .PHONY: .validate
 .validate: .get
-	$(TERRAFORM) validate -check-variables=false
+	$(TERRAFORM) validate
 
 .PHONY: .get
 .get:
