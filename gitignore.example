@@ -1,0 +1,7 @@
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+.terraform
+.kitchen
+.tf-build-harness.mk
+.build-cache
