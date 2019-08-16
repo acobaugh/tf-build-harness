@@ -1,6 +1,7 @@
 # Change these in your parent Makefile if desired
 TF_BUILD_HARNESS_IMAGE ?= quay.io/pennstate/tf-build-harness:latest
 AWS_DEFAULT_REGION ?= us-east-1
+TERRATEST_TIMEOUT ?= 10m
 
 # Do not edit below this line
 
@@ -9,10 +10,12 @@ BUILD_CACHE ?= $(shell pwd)/.build-cache
 DOCKER_USER ?= $(shell id -u)
 TF_BUILD_HARNESS_PATH ?= /tf-build-harness
 
+PWD := $(shell pwd)
+PROJECT := $(shell basename $PWD)
 DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	docker run --rm -it -u $(DOCKER_USER)\
-	-w /workdir \
-	-v $(shell pwd):/workdir \
+	-w /workdir/src/$(PROJECT) \
+	-v $(PWD):/workdir/src/$(PROJECT) \
 	-v $(BUILD_CACHE):/cache \
 	-e HOME=/tmp/$(DOCKER_USER) \
 	-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
@@ -27,7 +30,7 @@ DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	-e BUNDLE_SILENCE_ROOT_WARNING=1 \
 	$(TF_BUILD_HARNESS_IMAGE) 
 
-DOCKER_TARGETS := docs test lint get validate kitchen-test kitchen-destroy
+DOCKER_TARGETS := docs test lint get validate kitchen-test kitchen-destroy terratest
 .PHONY: $(DOCKER_TARGETS)
 
 .PHONY: help
@@ -66,13 +69,23 @@ else
 	bundle exec kitchen destroy
 endif
 
+.PHONY: .terratest
+.terratest:
+ifeq (,$(wildcard test/*.go))
+	@echo "No terratest tests, skipping terratest"
+else
+	dep ensure -vendor-only
+	echo "package main" > main.go
+	GOCACHE=off go test -v -timeout=$(TERRATEST_TIMEOUT) ./...
+endif
+
 .PHONY: clean
 clean:
 	rm -rf .build-cache .terraform .kitchen terraform.tfstate.d .tf-build-harness.mk
 	docker volume rm $(CACHE_VOLUME)
 
 .PHONY: .test
-.test: .kitchen-test 
+.test: .kitchen-test .terratest
 
 .PHONY: .docs
 .docs:

@@ -36,7 +36,7 @@ RUN curl -OsL https://github.com/segmentio/terraform-docs/releases/download/${TE
  && chmod +x /usr/local/bin/terraform-docs
 
 # gopath
-ENV GOPATH $HOME/go
+ENV GOPATH /workdir
 
 # rbenv
 ENV PATH /usr/local/rbenv/shims:/usr/local/rbenv/bin:$PATH
