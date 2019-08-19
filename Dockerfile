@@ -1,3 +1,12 @@
+FROM golang:1.12-alpine as gobuilder
+
+ENV project github.com/hashicorp/terraform-config-inspect
+RUN apk add git
+RUN go get $project \
+ && cd $GOPATH/src/$project \
+ && CGO_ENABLED=0 GOOS=linux go build -o /terraform-config-inspect
+
+
 FROM alpine:3.10
 
 ENV TERRAFORM_VERSION=0.12.6
@@ -63,8 +72,11 @@ RUN curl -Os \
  && chmod +x /usr/local/bin/terratest_log_parser
 
 # dep
-RUN curl -Os https://github.com/golang/dep/releases/download/${DEP_VERSION}/dep-linux-amd64 
- && mv dep-linux-amd64 /usr/local/bin/dep
+RUN curl -Os https://github.com/golang/dep/releases/download/${DEP_VERSION}/dep-linux-amd64 \
+ && mv dep-linux-amd64 /usr/local/bin/dep \
  && chmod +x /usr/local/bin/dep
+
+# terraform-config-inspect
+COPY --from=gobuilder /terraform-config-inspect /usr/local/bin/terraform-config-inspect
 
 WORKDIR /work
