@@ -7,17 +7,18 @@ TERRATEST_TIMEOUT ?= 10m
 
 TERRAFORM := /usr/local/bin/terraform
 BUILD_CACHE ?= $(shell pwd)/.build-cache
-DOCKER_USER ?= $(shell id -u)
+DOCKER_UID ?= $(shell id -u)
 TF_BUILD_HARNESS_PATH ?= /tf-build-harness
 
 PWD := $(shell pwd)
 PROJECT := $(shell basename $PWD)
 DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
-	docker run --rm -it -u $(DOCKER_USER)\
+	docker run --rm -it \
 	-w /workdir/src/$(PROJECT) \
 	-v $(PWD):/workdir/src/$(PROJECT) \
 	-v $(BUILD_CACHE):/cache \
-	-e HOME=/tmp/$(DOCKER_USER) \
+	-v $(HOME)/.ssh:/home/tfbuild/$(DOCKER_USER)/.ssh \
+	-e DOCKER_UID=$(DOCKER_UID) \
 	-e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	-e AWS_REGION=$(AWS_DEFAULT_REGION) \
@@ -37,6 +38,10 @@ DOCKER_TARGETS := docs test lint get validate kitchen-test kitchen-destroy terra
 help:
 	@echo Available targets:
 	@for t in $(DOCKER_TARGETS) clean; do echo -e \\t$$t ; done ;
+
+.PHONY: .adduser
+.adduser:
+	@adduser -D -u $(DOCKER_UID) tfbuild
 
 .PHONY: .lint 
 .lint:
@@ -104,7 +109,7 @@ ifdef CI
 	$(MAKE) .$@
 else
 	mkdir -p $(BUILD_CACHE)
-	@$(DOCKER) make .$@
+	@$(DOCKER) sh -c "$(MAKE) .adduser && su tfbuild -c '$(MAKE) .$@'"
 endif
 
 # vim: syntax=make
