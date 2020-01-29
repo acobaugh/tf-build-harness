@@ -1,10 +1,9 @@
 FROM golang:1.13-alpine as gobuilder
 
-ENV project github.com/hashicorp/terraform-config-inspect
 RUN apk add git
-RUN go get $project \
- && cd $GOPATH/src/$project \
- && CGO_ENABLED=0 GOOS=linux go build -o /terraform-config-inspect
+ENV GO111MODULE=on
+RUN go get github.com/hashicorp/terraform-config-inspect \
+ && cp `which terraform-config-inspect` /
 
 
 FROM alpine:3.11
