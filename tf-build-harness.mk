@@ -87,7 +87,6 @@ endif
 .PHONY: clean
 clean:
 	rm -rf .build-cache .terraform .kitchen terraform.tfstate.d .tf-build-harness.mk
-	docker volume rm $(CACHE_VOLUME)
 
 .PHONY: .test
 .test: .kitchen-test .terratest
