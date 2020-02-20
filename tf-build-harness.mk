@@ -99,7 +99,7 @@ ifeq (,$(wildcard README.header.md))
 else
 	cat README.header.md > README.md
 endif
-	BUILD_HARNESS_PATH=$(TF_BUILD_HARNESS_PATH) $(TF_BUILD_HARNESS_PATH)/bin/terraform-docs.sh md . >> README.md
+	terraform-docs . >> README.md
 	cat README.md
 
 

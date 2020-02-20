@@ -1,19 +1,17 @@
-FROM golang:1.12-alpine as gobuilder
+FROM golang:1.13-alpine as gobuilder
 
-ENV project github.com/hashicorp/terraform-config-inspect
 RUN apk add git
-RUN go get $project \
- && cd $GOPATH/src/$project \
- && CGO_ENABLED=0 GOOS=linux go build -o /terraform-config-inspect
+ENV GO111MODULE=on
+RUN go get github.com/hashicorp/terraform-config-inspect \
+ && cp `which terraform-config-inspect` /
 
 
-FROM alpine:3.10
+FROM alpine:3.11
 
-ENV TERRAFORM_VERSION=0.12.8
-ENV RUBY_VERSION=2.4.6
-ENV TERRATEST_LOG_PARSER_VERSION=0.17.5
-ENV TERRAFORM_DOCS_VERSION=v0.6.0
-ENV DEP_VERSION=v0.5.4
+ENV TERRAFORM_VERSION=0.12.19
+ENV RUBY_VERSION=2.4.9
+ENV TERRATEST_LOG_PARSER_VERSION=0.23.4
+ENV TERRAFORM_DOCS_VERSION=v0.8.1
 
 ENV TF_BUILD_HARNESS_PATH=/tf-build-harness
 
@@ -70,11 +68,6 @@ RUN curl -Os \
  https://github.com/gruntwork-io/terratest/releases/download/${TERRATEST_LOG_PARSER_VERSION}/terratest_log_parser_linux_amd64 \
  && mv terratest_log_parser_linux_amd64 /usr/local/bin/terratest_log_parser \
  && chmod +x /usr/local/bin/terratest_log_parser
-
-# dep
-RUN curl -Os https://github.com/golang/dep/releases/download/${DEP_VERSION}/dep-linux-amd64 \
- && mv dep-linux-amd64 /usr/local/bin/dep \
- && chmod +x /usr/local/bin/dep
 
 # terraform-config-inspect
 COPY --from=gobuilder /terraform-config-inspect /usr/local/bin/terraform-config-inspect
