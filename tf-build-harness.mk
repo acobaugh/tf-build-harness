@@ -79,9 +79,9 @@ endif
 ifeq (,$(wildcard test/*.go))
 	@echo "No terratest tests, skipping terratest"
 else
-	dep ensure -vendor-only
-	echo "package main" > main.go
-	GOCACHE=off go test -v -timeout=$(TERRATEST_TIMEOUT) ./...
+	cd test
+	go mod init terratest
+	go test -count=1 -timeout=$(TERRATEST_TIMEOUT)
 endif
 
 .PHONY: clean
