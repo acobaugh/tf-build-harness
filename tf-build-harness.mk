@@ -80,7 +80,6 @@ ifeq (,$(wildcard test/*.go))
 	@echo "No terratest tests, skipping terratest"
 else
 	cd test
-	go mod init terratest
 	go test -count=1 -timeout=$(TERRATEST_TIMEOUT)
 endif
 
