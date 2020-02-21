@@ -9,9 +9,10 @@ TERRAFORM := /usr/local/bin/terraform
 BUILD_CACHE ?= $(shell pwd)/.build-cache
 DOCKER_UID ?= $(shell id -u)
 TF_BUILD_HARNESS_PATH ?= /tf-build-harness
+export GO111MODULE=on
 
 PWD := $(shell pwd)
-PROJECT := $(shell basename $PWD)
+PROJECT := $(shell basename $(PWD))
 DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	docker run --rm -it \
 	-w /workdir/src/$(PROJECT) \
@@ -29,6 +30,8 @@ DOCKER = echo "=== Running in docker container $(TF_BUILD_HARNESS_IMAGE)"; \
 	-e BUNDLE_USER_CACHE=/cache/bundle-cache \
 	-e TF_PLUGIN_CACHE_DIR=/cache/terraform/plugin-cache \
 	-e BUNDLE_SILENCE_ROOT_WARNING=1 \
+	-e GOCACHE=/cache/gocache \
+	-e GOPATH=/cache/gopath \
 	$(TF_BUILD_HARNESS_IMAGE) 
 
 DOCKER_TARGETS := docs test lint get validate kitchen-test kitchen-destroy terratest
@@ -79,8 +82,7 @@ endif
 ifeq (,$(wildcard test/*.go))
 	@echo "No terratest tests, skipping terratest"
 else
-	cd test
-	go test -count=1 -timeout=$(TERRATEST_TIMEOUT)
+	cd test ; go test -v -count=1 -timeout=$(TERRATEST_TIMEOUT) ./...
 endif
 
 .PHONY: clean
